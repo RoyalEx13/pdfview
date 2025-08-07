@@ -1,3 +1,10 @@
 import { Routes } from '@angular/router';
+import { PdfViewer } from './pages/pdf-viewer/pdf-viewer';
+import { PageNotFound } from './pages/page-not-found/page-not-found';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+  { path: '', redirectTo: '/table-du-sus/sofa', pathMatch: 'full' },
+  { path: 'table-du-sus/:name', component: PdfViewer },
+  { path: '404', component: PageNotFound },
+  { path: '**', redirectTo: '404' }
+];
