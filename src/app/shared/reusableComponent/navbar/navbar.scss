@@ -1,0 +1,15 @@
+nav {
+  background: white;
+  transition: top 0.3s ease-in-out;
+  z-index: 1030;
+}
+
+nav.hidden {
+  top: -80px;
+}
+
+@media (max-width: 576px) {
+  nav img {
+    max-height: 40px;
+  }
+}
