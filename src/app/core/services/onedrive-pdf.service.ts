@@ -14,7 +14,7 @@ export class OnedrivePdfService {
     const body = { name: documentName };
     const pdf = '/src/assets/pdfs/{{documentName}}.pdf';
 
-    const url = `https://furo-s3.s3.ap-southeast-1.amazonaws.com/${{documentName}}.pdf`;
+    const url = `https://furo-s3.s3.ap-southeast-1.amazonaws.com/${documentName}.pdf`;
     return this.http.get(url,{ responseType: 'blob' });
     // const pdfUrl = `assets/pdfs/${documentName}.pdf`;
     // return this.http.get(pdfUrl, { responseType: 'blob' });
