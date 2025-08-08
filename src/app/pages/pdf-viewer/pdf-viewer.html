@@ -1,20 +1,28 @@
-<div class="pb-3 pb-md-5 min-vh-100">
-  <ngx-extended-pdf-viewer
-    [src]="pdfFile"
-    pageViewMode="book"
-    [showBorders]="false"
-    [zoom]="'page-fit'"
-    [showSecondaryToolbarButton]="false"
-    [showSinglePageModeButton]="false"
-    [showMovePageButton]="true"
-    [showZoomDropdown]="false"
-    [showDrawEditor]="false"
-    [showTextEditor]="false"
-    [contentEditable]="false"
-    [showPreviousAndNextPageButtons]="true"
-  >
-  </ngx-extended-pdf-viewer>
+<div class="my-5 d-flex justify-content-center align-items-center">
+  <div class="row w-100">
+    <div class="col-12">
+      <ngx-extended-pdf-viewer
+        [src]="pdfFile"
+        pageViewMode="book"
+        [showBorders]="false"
+        [zoom]="'page-fit'"
+        [showSecondaryToolbarButton]="false"
+        [showSinglePageModeButton]="false"
+        [showMovePageButton]="true"
+        [showZoomDropdown]="false"
+        [showDrawEditor]="false"
+        [showTextEditor]="false"
+        [contentEditable]="false"
+        [showPreviousAndNextPageButtons]="true"
+        [scrollMode]="2"
+        [sidebarVisible]="false"
+        [height]="'70vh'"
+      >
+      </ngx-extended-pdf-viewer>
+    </div>
+  </div>
 </div>
+
 <ngx-spinner
   bdColor="rgba(0,0,0,0.7)"
   color="#fff"

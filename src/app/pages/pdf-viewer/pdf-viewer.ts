@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { sharedModule } from '../../core/shared/shared';
 import { OnedrivePdfService } from '../../core/services/onedrive-pdf.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { timeout } from 'rxjs';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -12,19 +12,19 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   styleUrl: './pdf-viewer.scss',
 })
 export class PdfViewer implements OnInit {
+  @ViewChild('flipbookContainer', { static: true })
+  container!: ElementRef<HTMLDivElement>;
   isLoading: boolean = true;
-  documentName:string = '';
+  documentName: string = '';
   pdfFile: Blob = new Blob();
   pdfUrl: string = '';
-  sanitizedPdfUrl: SafeResourceUrl | null = null;
-
-
+  images: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private pdfService: OnedrivePdfService,
-    private spinner:  NgxSpinnerService,
-    private sanitizer: DomSanitizer
+    private spinner: NgxSpinnerService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -46,6 +46,7 @@ export class PdfViewer implements OnInit {
       error: (err) => {
         console.error('Failed to load PDF:', err);
         this.hideSpinner();
+        this.router.navigate(['/']);
       },
     });
   }
