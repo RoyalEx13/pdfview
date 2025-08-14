@@ -1,0 +1,56 @@
+<div class="controls row justify-content-center align-items-center h-100">
+  <button type="button" class="btn btn-primary col-1" (click)="prev()">
+    Prev
+  </button>
+  <div class="flipbook-container col-10">
+    <div class="flipbook border border-dark">
+      <div class="page left perv" [class.hidden]="!pages[pagenum - 3]">
+        @if(pages[pagenum - 3]){
+        <img class="prev" [src]="pages[pagenum - 3]" alt="Left Page" />}
+      </div>
+      <div
+        class="page left current"
+        [class.flippingPrev]="isFlippingPrev"
+        [class.hidden]="!(pages[pagenum - 1] || pages[pagenum - 2])"
+      >
+        @if(!isFlippingPrevHalf){<img
+          class="page-current"
+          [src]="pages[pagenum - 1]"
+          alt="Left Page"
+        />} @if(isFlippingPrevHalf){
+        <img
+          class="page-back-current"
+          [src]="pages[pagenum - 2]"
+          alt="Left Back Page"
+        />}
+      </div>
+      <div class="page right next" [class.hidden]="!pages[pagenum + 2]">
+        @if(pages[pagenum + 2]){
+        <img class="next" [src]="pages[pagenum + 2]" alt="Right Page" />}
+      </div>
+      <div
+        class="page right current"
+        [class.flippingNext]="isFlippingNext"
+        [class.hidden]="!(pages[pagenum] || pages[pagenum + 1])"
+      >
+        @if(!isFlippingNextHalf){
+        <img class="page-current" [src]="pages[pagenum]" alt="Right Page" />}
+        @if(isFlippingNextHalf){
+        <img
+          class="page-back-current"
+          [src]="pages[pagenum + 1]"
+          alt="Right Back Page"
+        />}
+      </div>
+
+    </div>
+      <span class="col-3 text-center">
+        {{ pagenum  }}@if (pages[pagenum ]) {-{{ pagenum + 1 }} } /
+        {{ pages.length }}
+      </span>
+
+  </div>
+  <button type="button" class="btn btn-primary col-1" (click)="next()">
+      Next
+    </button>
+</div>
