@@ -1,3 +1,4 @@
 export const environment = {
-  onedrivePdfApiUrl:'https://prod-85.southeastasia.logic.azure.com:443/workflows/f2094736f6694304883cb3771812fbfc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9Y0_jJlaHE1bDkwGrFhHrjsYALh6NMVDSmut0n-WNeM',
+  blobStoragePdfUrl: 'https://tabledususpdfviewer.blob.core.windows.net/pdfs/pdfs',
+  blobSasToken:'sp=r&st=2025-08-15T04:22:58Z&se=2025-08-15T12:37:58Z&spr=https&sv=2024-11-04&sr=c&sig=Pz7NQHwA6PHnEZCiBoV2AQlq0z8ksGtWtnKYU6zotxM%3D',
 };
