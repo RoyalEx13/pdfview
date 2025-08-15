@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { sharedModule } from '../../core/shared/shared';
-import { OnedrivePdfService } from '../../core/services/onedrive-pdf.service';
+import { PdfService } from '../../core/services/pdf.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { timeout } from 'rxjs';
@@ -22,7 +22,7 @@ export class PdfViewer implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private pdfService: OnedrivePdfService,
+    private pdfService: PdfService,
     private spinner: NgxSpinnerService,
     private router: Router
   ) {}
@@ -38,7 +38,7 @@ export class PdfViewer implements OnInit {
 
   fetchPdfUrl() {
     this.showSpinner();
-    this.pdfService.fetchPdfUrl(this.documentName).subscribe({
+    this.pdfService.blobStorage(this.documentName).subscribe({
       next: (res: Blob) => {
         this.pdfFile = res;
         this.hideSpinner();
