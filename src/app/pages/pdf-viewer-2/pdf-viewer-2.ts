@@ -41,6 +41,7 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
   isLoading: boolean = true;
   sidebarOpen: boolean = true;
   pdfUrl: string = '';
+  clickThreshold = 5;
 
   constructor(
     private route: ActivatedRoute,
@@ -51,12 +52,12 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
     this.showSpinner();
     const baseUrl = environment.blobStoragePdfUrl;
     const blobSasToken = environment.blobSasToken;
+    document.addEventListener('mouseup', this.endDrag.bind(this));
 
     this.route.paramMap.subscribe((params) => {
       this.documentName = params.get('name') || '';
       if (this.documentName) {
         this.pdfUrl = `${baseUrl}/${this.documentName}.pdf?${blobSasToken}`;
-        document.addEventListener('mouseup', () => this.endDrag());
 
         this.getPdfTotalPages(this.pdfUrl).then(async (numPages) => {
           const promises = Array.from({ length: numPages }, (_, i) =>
@@ -176,8 +177,10 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
       '.flipbook'
     ) as HTMLElement;
     flipbook.style.transition = 'none';
+
     this.startX = event.clientX - this.offsetX;
     this.startY = event.clientY - this.offsetY;
+
     event.preventDefault();
   }
 
@@ -209,18 +212,30 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
     this.offsetY = Math.min(maxY, Math.max(minY, newY));
   }
 
-  endDrag() {
-    this.isDragging = false;
+  endDrag(event: MouseEvent) {
     const flipbook = this.flipbookContainer.nativeElement.querySelector(
       '.flipbook'
     ) as HTMLElement;
     flipbook.style.transition = 'transform 0.3s ease-in-out';
-  }
 
-  onFlipbookClick(): void {
     if (this.zoomLevel === 1) {
-      this.zoomIn();
+      const dx = Math.abs(event.clientX - (this.startX + this.offsetX));
+      const dy = Math.abs(event.clientY - (this.startY + this.offsetY));
+
+      if (dx < this.clickThreshold && dy < this.clickThreshold) {
+        const container = this.flipbookContainer.nativeElement as HTMLElement;
+        const containerRect = container.getBoundingClientRect();
+        const clickX = event.clientX - containerRect.left;
+
+        if (clickX < containerRect.width / 2) {
+          this.prev();
+        } else {
+          this.next();
+        }
+      }
     }
+
+    this.isDragging = false;
   }
 
   showSpinner(): void {
