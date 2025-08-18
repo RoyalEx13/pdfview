@@ -25,7 +25,8 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
   flipbookContainer!: ElementRef<HTMLDivElement>;
 
   pages: string[] = [];
-  pagenum: number = 0;
+  displayPageIndex: number = 0;
+  selectedPageIndex: number = 0;
   isFlippingNext = false;
   isFlippingNextHalf = false;
   isFlippingPrev = false;
@@ -38,14 +39,15 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
   isDragging = false;
   documentName: string = '';
   isLoading: boolean = true;
+  sidebarOpen: boolean = true;
 
   constructor(
     private route: ActivatedRoute,
-    private spinner: NgxSpinnerService,
-    private router: Router
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit() {
+    this.showSpinner();
     const baseUrl = environment.blobStoragePdfUrl;
     const blobSasToken = environment.blobSasToken;
     this.route.paramMap.subscribe((params) => {
@@ -82,14 +84,17 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
     if (this.isFlippingNext || this.isFlippingPrev) {
       return;
     }
-    if (this.pagenum < this.pages.length - 1) {
+    if (this.displayPageIndex < this.pages.length - 1) {
       this.isFlippingNext = true;
       setTimeout(() => (this.isFlippingNextHalf = true), 100);
       setTimeout(
         () => (
           (this.isFlippingNextHalf = false),
           (this.isFlippingNext = false),
-          (this.pagenum += 2)
+          (this.displayPageIndex += 2),
+          (this.selectedPageIndex = this.pages?.[this.displayPageIndex]
+            ? this.displayPageIndex
+            : this.displayPageIndex - 1)
         ),
         200
       );
@@ -100,14 +105,15 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
     if (this.isFlippingNext || this.isFlippingPrev) {
       return;
     }
-    if (this.pagenum >= 1) {
+    if (this.displayPageIndex >= 1) {
       this.isFlippingPrev = true;
       setTimeout(() => (this.isFlippingPrevHalf = true), 100);
       setTimeout(
         () => (
           (this.isFlippingPrevHalf = false),
           (this.isFlippingPrev = false),
-          (this.pagenum -= 2)
+          (this.displayPageIndex -= 2),
+          (this.selectedPageIndex = this.displayPageIndex)
         ),
         200
       );
@@ -116,12 +122,12 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
 
   async convertPdfPageToImage(
     pdfUrl: string,
-    pageNumber: number,
+    displayPageIndexber: number,
     dpi: number = 300
   ): Promise<string> {
     const loadingTask = pdfjsLib.getDocument(pdfUrl);
     const pdf = await loadingTask.promise;
-    const page = await pdf.getPage(pageNumber);
+    const page = await pdf.getPage(displayPageIndexber);
 
     const viewport = page.getViewport({ scale: dpi / 72 });
     const canvas = document.createElement('canvas');
@@ -226,5 +232,22 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
   hideSpinner(): void {
     this.isLoading = false;
     this.spinner.hide();
+  }
+
+  goToPage(idx: number): void {
+    this.selectedPageIndex = idx;
+
+    this.displayPageIndex =
+      this.selectedPageIndex % 2 === 0
+        ? this.selectedPageIndex
+        : this.selectedPageIndex + 1;
+    this.isFlippingNext = false;
+    this.isFlippingPrev = false;
+    this.isFlippingNextHalf = false;
+    this.isFlippingPrevHalf = false;
+  }
+
+  toggleSideBar(): void{
+    this.sidebarOpen = !this.sidebarOpen
   }
 }
