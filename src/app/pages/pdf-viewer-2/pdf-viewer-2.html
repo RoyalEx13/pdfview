@@ -1,5 +1,5 @@
 <div class="d-flex h-100">
-  <div class="sidebar border-end" [class.closed] = "sidebarOpen">
+  <div class="sidebar border-end" [class.closed]="sidebarOpen">
     @for (page of pages; track page; let idx = $index) {
     <div
       class="thumbnail m-2"
@@ -10,12 +10,17 @@
       <p class="text-center">{{ idx + 1 }}</p>
     </div>
     }
-</div>
+  </div>
 
   <div class="flex-grow-1 position-relative p-2">
-    <button class="position-absolute btn btn-light" (click)="toggleSideBar();">
-      <i class="fa-solid fa-bars"></i>
-    </button>
+    <div class="position-absolute">
+      <button class="btn btn-light" (click)="toggleSideBar()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <button class="btn btn-light" (click)="downloadPdf()">
+        <i class="fa-solid fa-download"></i>
+      </button>
+    </div>
     <div class="controls row justify-content-center align-items-center">
       <div class="col-1">
         <button type="button" class="btn btn-light" (click)="prev()">

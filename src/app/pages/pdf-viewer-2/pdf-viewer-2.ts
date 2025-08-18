@@ -40,6 +40,7 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
   documentName: string = '';
   isLoading: boolean = true;
   sidebarOpen: boolean = true;
+  pdfUrl: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -50,18 +51,16 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
     this.showSpinner();
     const baseUrl = environment.blobStoragePdfUrl;
     const blobSasToken = environment.blobSasToken;
+
     this.route.paramMap.subscribe((params) => {
       this.documentName = params.get('name') || '';
       if (this.documentName) {
-        // const pdfUrl = `${baseUrl}/${this.documentName}.pdf?${blobSasToken}`;
-        const pdfUrl =
-          'https://tabledususpdfviewer.blob.core.windows.net/pdfs/pdfs/Eetkamerbank_Seto.pdf?sp=r&st=2025-08-15T04:20:38Z&se=2026-08-15T12:35:38Z&sv=2024-11-04&sr=c&sig=H%2BTxmuJsWqodD9quvjM6Bngn0Qlb%2F4SxZofAhF7fA3Q%3D';
-
+        this.pdfUrl = `${baseUrl}/${this.documentName}.pdf?${blobSasToken}`;
         document.addEventListener('mouseup', () => this.endDrag());
 
-        this.getPdfTotalPages(pdfUrl).then(async (numPages) => {
+        this.getPdfTotalPages(this.pdfUrl).then(async (numPages) => {
           const promises = Array.from({ length: numPages }, (_, i) =>
-            this.convertPdfPageToImage(pdfUrl, i + 1, 300)
+            this.convertPdfPageToImage(this.pdfUrl, i + 1, 300)
           );
 
           this.pages = await Promise.all(promises).then((pages) => {
@@ -247,7 +246,23 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
     this.isFlippingPrevHalf = false;
   }
 
-  toggleSideBar(): void{
-    this.sidebarOpen = !this.sidebarOpen
+  toggleSideBar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  downloadPdf(): void {
+    if (!this.pdfUrl) return;
+
+    fetch(this.pdfUrl)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = this.pdfUrl.split('/').pop()?.split('?')[0] || 'pdf.pdf';
+        a.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch((err) => console.error('Download failed', err));
   }
 }
