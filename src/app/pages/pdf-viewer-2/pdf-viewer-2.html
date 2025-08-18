@@ -21,16 +21,16 @@
         <i class="fa-solid fa-download"></i>
       </button>
     </div>
-    <div class="controls row justify-content-center align-items-center">
-      <div class="col-1">
-        <button type="button" class="btn btn-light" (click)="prev()">
-          <i class="fa-solid fa-angle-left fa-2x"></i>
-        </button>
-      </div>
+    <div class="controls d-flex align-items-center justify-content-center">
 
-      <div class="col-10 position-relative">
+        <button type="button" class="btn btn-light me-1" (click)="prev()">
+          <i class="fa-solid fa-angle-left"></i>
+        </button>
+
+
+      <div class="position-relative w-100">
         <div
-          class="flipbook-container border border-primary"
+          class="flipbook-container border"
           #flipbookContainer
           (mousedown)="startDrag($event)"
           (mousemove)="onDrag($event)"
@@ -121,7 +121,7 @@
             <i class="fa-solid fa-repeat"></i>
           </button>
           @if(zoomLevel !== 1){
-          <p>{{ zoomLevel * 100 | number : "1.0-0" }}%</p>
+          {{ zoomLevel * 100 | number : "1.0-0" }}%
           }
         </div>
         <span class="col-3 text-center">
@@ -134,11 +134,9 @@
           }/ {{ pages.length }}
         </span>
       </div>
-      <div class="col-1">
-        <button type="button" class="btn btn-light" (click)="next()">
-          <i class="fa-solid fa-angle-right fa-2x"></i>
+        <button type="button" class="btn btn-light ms-1" (click)="next()">
+          <i class="fa-solid fa-angle-right"></i>
         </button>
-      </div>
     </div>
   </div>
 </div>
