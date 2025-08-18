@@ -1,21 +1,35 @@
 .flipbook-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  object-fit: fill;
   margin-top: 50px;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.flipbook-container::-webkit-scrollbar {
+  display: none;
+}
+
+.flipbook-container:active {
+  cursor: grabbing;
 }
 
 .flipbook {
-  display: hide;
-  width: 711px;
-  height: 503px;
-  perspective: 100vw;
-  background-image: url("https://e7.pngegg.com/pngimages/204/755/png-clipart-board-wood-wood-board-wood-thumbnail.png");
-  background-size: cover;
+  height: 75vh;
+  background-size:  contain;
   background-position: center;
   background-repeat: no-repeat;
   overflow: hidden;
+  transition: transform 0.3s ease-in-out;
+}
+
+.controls {
+  position: static;
+  top: 0%;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
 }
 
 .left {
@@ -43,7 +57,7 @@
 .page img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   top: 0;
   right: 50%;
   transform: preserve-3d;

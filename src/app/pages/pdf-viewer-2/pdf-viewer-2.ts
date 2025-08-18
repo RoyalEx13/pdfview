@@ -1,30 +1,84 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import { environment } from '../../environment/environment';
+import { sharedModule } from '../../core/shared/shared';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 @Component({
   selector: 'app-pdf-viewer-2',
-  imports: [],
+  imports: [sharedModule],
   templateUrl: './pdf-viewer-2.html',
   styleUrl: './pdf-viewer-2.scss',
 })
-export class PdfViewer2 implements OnInit {
+export class PdfViewer2 implements OnInit, AfterViewInit {
+  @ViewChild('flipbookContainer', { static: true })
+  flipbookContainer!: ElementRef<HTMLDivElement>;
+
   pages: string[] = [];
   pagenum: number = 0;
   isFlippingNext = false;
   isFlippingNextHalf = false;
   isFlippingPrev = false;
   isFlippingPrevHalf = false;
+  zoomLevel = 1;
+  offsetX = 0;
+  offsetY = 0;
+  startX = 0;
+  startY = 0;
+  isDragging = false;
+  documentName: string = '';
+  isLoading: boolean = true;
+
+  constructor(
+    private route: ActivatedRoute,
+    private spinner: NgxSpinnerService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    this.pages = Array.from(
-      { length: 20 },
-      (_, i) =>
-        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
-          i + 1
-        }.png`
-    );
+    const baseUrl = environment.blobStoragePdfUrl;
+    const blobSasToken = environment.blobSasToken;
+    this.route.paramMap.subscribe((params) => {
+      this.documentName = params.get('name') || '';
+      if (this.documentName) {
+        // const pdfUrl = `${baseUrl}/${this.documentName}.pdf?${blobSasToken}`;
+        const pdfUrl =
+          'https://tabledususpdfviewer.blob.core.windows.net/pdfs/pdfs/Eetkamerbank_Seto.pdf?sp=r&st=2025-08-15T04:20:38Z&se=2026-08-15T12:35:38Z&sv=2024-11-04&sr=c&sig=H%2BTxmuJsWqodD9quvjM6Bngn0Qlb%2F4SxZofAhF7fA3Q%3D';
+
+        document.addEventListener('mouseup', () => this.endDrag());
+
+        this.getPdfTotalPages(pdfUrl).then(async (numPages) => {
+          const promises = Array.from({ length: numPages }, (_, i) =>
+            this.convertPdfPageToImage(pdfUrl, i + 1, 300)
+          );
+
+          this.pages = await Promise.all(promises).then((pages) => {
+            this.hideSpinner();
+            return pages;
+          });
+        });
+      }
+    });
   }
 
-  next() {
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.offsetX = 0;
+      this.offsetY = 0;
+    });
+  }
+
+  next(): void {
     if (this.isFlippingNext || this.isFlippingPrev) {
       return;
     }
@@ -42,7 +96,7 @@ export class PdfViewer2 implements OnInit {
     }
   }
 
-  prev() {
+  prev(): void {
     if (this.isFlippingNext || this.isFlippingPrev) {
       return;
     }
@@ -58,5 +112,119 @@ export class PdfViewer2 implements OnInit {
         200
       );
     }
+  }
+
+  async convertPdfPageToImage(
+    pdfUrl: string,
+    pageNumber: number,
+    dpi: number = 300
+  ): Promise<string> {
+    const loadingTask = pdfjsLib.getDocument(pdfUrl);
+    const pdf = await loadingTask.promise;
+    const page = await pdf.getPage(pageNumber);
+
+    const viewport = page.getViewport({ scale: dpi / 72 });
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    const renderContext = {
+      canvasContext: context,
+      viewport: viewport,
+    };
+    await page.render(renderContext).promise;
+
+    return canvas.toDataURL('image/png');
+  }
+
+  async getPdfTotalPages(pdfUrl: string): Promise<number> {
+    const loadingTask = pdfjsLib.getDocument(pdfUrl);
+    const pdf = await loadingTask.promise;
+    return pdf.numPages;
+  }
+
+  zoomIn() {
+    this.zoomLevel += 0.5;
+  }
+
+  zoomOut() {
+    if (this.zoomLevel >= 1.5) {
+      this.zoomLevel -= 0.5;
+    }
+    if (this.zoomLevel == 1) {
+      this.resetZoom();
+    }
+  }
+
+  resetZoom() {
+    this.zoomLevel = 1;
+    this.isDragging = false;
+
+    this.offsetX = 0;
+    this.offsetY = 0;
+  }
+
+  startDrag(event: MouseEvent) {
+    this.isDragging = true;
+    const flipbook = this.flipbookContainer.nativeElement.querySelector(
+      '.flipbook'
+    ) as HTMLElement;
+    flipbook.style.transition = 'none';
+    this.startX = event.clientX - this.offsetX;
+    this.startY = event.clientY - this.offsetY;
+    event.preventDefault();
+  }
+
+  onDrag(event: MouseEvent) {
+    if (!this.isDragging || this.zoomLevel === 1) return;
+
+    let newX = event.clientX - this.startX;
+    let newY = event.clientY - this.startY;
+
+    const container = this.flipbookContainer.nativeElement as HTMLElement;
+    const flipbook = container.querySelector('.flipbook') as HTMLElement;
+
+    const scaledWidth =
+      this.zoomLevel === 1
+        ? 0
+        : flipbook.clientWidth * (this.zoomLevel * 0.1 + 0.05);
+
+    const scaledHeight =
+      this.zoomLevel === 1
+        ? 0
+        : flipbook.clientHeight * (this.zoomLevel * 0.1 + 0.05);
+
+    const minX = Math.min(0, -scaledWidth);
+    const maxX = Math.max(0, scaledWidth);
+    const minY = Math.min(0, -scaledHeight);
+    const maxY = Math.max(0, scaledHeight);
+
+    this.offsetX = Math.min(maxX, Math.max(minX, newX));
+    this.offsetY = Math.min(maxY, Math.max(minY, newY));
+  }
+
+  endDrag() {
+    this.isDragging = false;
+    const flipbook = this.flipbookContainer.nativeElement.querySelector(
+      '.flipbook'
+    ) as HTMLElement;
+    flipbook.style.transition = 'transform 0.3s ease-in-out';
+  }
+
+  onFlipbookClick(): void {
+    if (this.zoomLevel === 1) {
+      this.zoomIn();
+    }
+  }
+
+  showSpinner(): void {
+    this.isLoading = true;
+    this.spinner.show();
+  }
+
+  hideSpinner(): void {
+    this.isLoading = false;
+    this.spinner.hide();
   }
 }
