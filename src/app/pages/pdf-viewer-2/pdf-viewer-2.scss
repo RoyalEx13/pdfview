@@ -1,0 +1,106 @@
+.flipbook-container {
+  display: flex;
+  flex-direction: column;
+  object-fit: fill;
+  margin-top: 50px;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.flipbook-container::-webkit-scrollbar {
+  display: none;
+}
+
+.flipbook-container:active {
+  cursor: grabbing;
+}
+
+.flipbook {
+  height: 75vh;
+  background-size:  contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out;
+}
+
+.controls {
+  position: static;
+  top: 0%;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+.left {
+  background-color: white;
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  right: 50%;
+  z-index: 1;
+}
+
+.right {
+  background-color: white;
+  left: 50%;
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  z-index: 1;
+}
+
+.page-back-current {
+  transform: rotateY(3.142rad);
+}
+
+.page img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  top: 0;
+  right: 50%;
+  transform: preserve-3d;
+}
+
+.flippingNext {
+  transform-origin: left;
+  animation: pageFlip 0.2s ease-in-out forwards;
+}
+
+.flippingPrev {
+  transform-origin: right;
+  animation: pageFlipBack 0.2s ease-in-out forwards;
+}
+
+@keyframes pageFlip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    z-index: 2;
+    transform: rotateY(-90deg);
+  }
+  100% {
+    z-index: 2;
+    transform: rotateY(-180deg);
+  }
+}
+
+@keyframes pageFlipBack {
+  0% {
+    transform: rotateY(0);
+  }
+  50% {
+    z-index: 2;
+    transform: rotateY(90deg);
+  }
+  100% {
+    z-index: 2;
+    transform: rotateY(180deg);
+  }
+}
+
+.hidden {
+  display: none;
+}

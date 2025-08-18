@@ -1,0 +1,105 @@
+<div class="controls row justify-content-center align-items-center h-100">
+  <div class="col-1">
+    <button type="button" class="btn btn-light" (click)="prev()">
+      <i class="fa-solid fa-angle-left fa-2x"></i>
+    </button>
+  </div>
+
+  <div class="col-10 position-relative">
+    <div
+      class="flipbook-container border border-primary"
+      #flipbookContainer
+      (mousedown)="startDrag($event)"
+      (mousemove)="onDrag($event)"
+    >
+      <div
+        class="flipbook"
+        [style.transform]="
+          'scale(' +
+          zoomLevel +
+          ') translate(' +
+          offsetX +
+          'px,' +
+          offsetY +
+          'px)'
+        "
+        [style.transformOrigin]="'center center'"
+        (click)="onFlipbookClick()"
+      >
+        <div class="page left perv" [class.hidden]="!pages[pagenum - 3]">
+          @if(pages[pagenum - 3]){
+          <img class="prev" [src]="pages[pagenum - 3]" alt="Left Page" />}
+        </div>
+        <div
+          class="page left current"
+          [class.flippingPrev]="isFlippingPrev"
+          [class.hidden]="!(pages[pagenum - 1] || pages[pagenum - 2])"
+        >
+          @if(!isFlippingPrevHalf){<img
+            class="page-current"
+            [src]="pages[pagenum - 1]"
+            alt="Left Page"
+          />} @if(isFlippingPrevHalf){
+          <img
+            class="page-back-current"
+            [src]="pages[pagenum - 2]"
+            alt="Left Back Page"
+          />}
+        </div>
+        <div class="page right next" [class.hidden]="!pages[pagenum + 2]">
+          @if(pages[pagenum + 2]){
+          <img class="next" [src]="pages[pagenum + 2]" alt="Right Page" />}
+        </div>
+        <div
+          class="page right current"
+          [class.flippingNext]="isFlippingNext"
+          [class.hidden]="!(pages[pagenum] || pages[pagenum + 1])"
+        >
+          @if(!isFlippingNextHalf){
+          <img class="page-current" [src]="pages[pagenum]" alt="Right Page" />}
+          @if(isFlippingNextHalf){
+          <img
+            class="page-back-current"
+            [src]="pages[pagenum + 1]"
+            alt="Right Back Page"
+          />}
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <button (click)="zoomIn()" class="btn btn-light" type="button">
+        <i class="fa-solid fa-magnifying-glass-plus"></i>
+      </button>
+      <button (click)="zoomOut()" class="btn btn-light" type="button">
+        <i class="fa-solid fa-magnifying-glass-minus"></i>
+      </button>
+      <button (click)="resetZoom()" class="btn btn-light" type="button">
+        <i class="fa-solid fa-repeat"></i>
+      </button>
+      @if(zoomLevel !== 1){
+      <p>{{ zoomLevel * 100 | number : "1.0-0" }}%</p>
+      }
+    </div>
+    <span class="col-3 text-center">
+      @if (pagenum == 0){
+      {{ pagenum + 1 }}
+      }@else if (pages[pagenum]) {
+      {{ pagenum }} - {{ pagenum + 1 }}
+      }@else{
+      {{ pagenum }}
+      }/ {{ pages.length }}
+    </span>
+  </div>
+  <div class="col-1">
+    <button type="button" class="btn btn-light" (click)="next()">
+      <i class="fa-solid fa-angle-right fa-2x"></i>
+    </button>
+  </div>
+</div>
+
+<ngx-spinner
+  bdColor="rgba(0,0,0,0.7)"
+  color="#fff"
+  type="ball-scale-multiple"
+  [fullScreen]="true"
+/>
