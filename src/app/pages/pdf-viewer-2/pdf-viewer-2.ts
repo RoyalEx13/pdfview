@@ -190,26 +190,8 @@ export class PdfViewer2 implements OnInit, AfterViewInit {
     let newX = event.clientX - this.startX;
     let newY = event.clientY - this.startY;
 
-    const container = this.flipbookContainer.nativeElement as HTMLElement;
-    const flipbook = container.querySelector('.flipbook') as HTMLElement;
-
-    const scaledWidth =
-      this.zoomLevel === 1
-        ? 0
-        : flipbook.clientWidth * (this.zoomLevel * 0.1 + 0.05);
-
-    const scaledHeight =
-      this.zoomLevel === 1
-        ? 0
-        : flipbook.clientHeight * (this.zoomLevel * 0.1 + 0.05);
-
-    const minX = Math.min(0, -scaledWidth);
-    const maxX = Math.max(0, scaledWidth);
-    const minY = Math.min(0, -scaledHeight);
-    const maxY = Math.max(0, scaledHeight);
-
-    this.offsetX = Math.min(maxX, Math.max(minX, newX));
-    this.offsetY = Math.min(maxY, Math.max(minY, newY));
+    this.offsetX =  newX;
+    this.offsetY =  newY;
   }
 
   endDrag(event: MouseEvent) {
