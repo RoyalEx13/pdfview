@@ -63,6 +63,8 @@
   top: 0;
   right: 50%;
   transform: preserve-3d;
+  pointer-events: none;
+  user-select: none;
 }
 
 .flippingNext {
@@ -143,4 +145,6 @@ button:disabled {
   cursor: not-allowed;
   opacity: 1;
 }
+
+
 
