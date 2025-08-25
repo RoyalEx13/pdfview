@@ -12,23 +12,38 @@
     }
   </div>
 
-  <div class="flex-grow-1 position-relative p-2">
-    <div class="position-absolute">
-      <button class="btn btn-light" (click)="toggleSideBar()">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-      <button class="btn btn-light" (click)="downloadPdf()">
-        <i class="fa-solid fa-download"></i>
-      </button>
-    </div>
-    <div class="controls d-flex align-items-center justify-content-center">
+  <div class="flex-grow-1 position-relative p-0">
+    <div class="controls d-flex">
+      <div class="d-flex align-items-end flex-column h-50">
+        <button class="btn btn-light" (click)="toggleSideBar()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <button class="btn btn-light" (click)="downloadPdf()">
+          <i class="fa-solid fa-download"></i>
+        </button>
+        <button (click)="zoomIn()" class="btn btn-light" type="button">
+          <i class="fa-solid fa-magnifying-glass-plus"></i>
+        </button>
+        <button (click)="zoomOut()" class="btn btn-light" type="button">
+          <i class="fa-solid fa-magnifying-glass-minus"></i>
+        </button>
+        @if(zoomLevel !== 1){
+        <div class="text-center fw-bold mt-2">
+          {{ zoomLevel * 100 | number : "1.0-0" }}%
+        </div>
+        }
 
-        <button type="button" class="btn btn-light me-1" (click)="prev()">
+        <button
+          type="button"
+          class="btn btn-light mt-auto h-25"
+          (click)="prev()"
+          [disabled]="displayPageIndex < 1"
+        >
           <i class="fa-solid fa-angle-left"></i>
         </button>
+      </div>
 
-
-      <div class="position-relative w-100">
+      <div class="position-relative w-100 align-content-center">
         <div
           class="flipbook-container border"
           #flipbookContainer
@@ -109,33 +124,12 @@
             </div>
           </div>
         </div>
-        <div class="controls">
-          <button (click)="zoomIn()" class="btn btn-light" type="button">
-            <i class="fa-solid fa-magnifying-glass-plus"></i>
-          </button>
-          <button (click)="zoomOut()" class="btn btn-light" type="button">
-            <i class="fa-solid fa-magnifying-glass-minus"></i>
-          </button>
-          <button (click)="resetZoom()" class="btn btn-light" type="button">
-            <i class="fa-solid fa-repeat"></i>
-          </button>
-          @if(zoomLevel !== 1){
-          {{ zoomLevel * 100 | number : "1.0-0" }}%
-          }
-        </div>
-        <span class="col-3 text-center">
-          @if (displayPageIndex == 0){
-          {{ displayPageIndex + 1 }}
-          }@else if (pages[displayPageIndex]) {
-          {{ displayPageIndex }} - {{ displayPageIndex + 1 }}
-          }@else{
-          {{ displayPageIndex }}
-          }/ {{ pages.length }}
-        </span>
       </div>
-        <button type="button" class="btn btn-light ms-1" (click)="next()">
+      <div class="h-50 d-flex justify-content-end flex-column">
+        <button type="button" class="btn btn-light h-25" (click)="next()" [disabled]="this.displayPageIndex >= this.pages.length - 1">
           <i class="fa-solid fa-angle-right"></i>
         </button>
+      </div>
     </div>
   </div>
 </div>
